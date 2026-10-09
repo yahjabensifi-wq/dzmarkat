@@ -1,9 +1,95 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>متجري الإلكتروني</title><link rel="stylesheet" href="style.css"></head><body>
-<header class="top"><div class="brand">متجري 🛍️<small>كل ما تحتاجه في مكان واحد</small></div><div class="actions"><button onclick="openCart()">🛒 السلة <b id="count">0</b></button><button onclick="location.href='admin.html'">⚙️ الإدارة</button></div></header>
-<section class="hero"><div><div>🔥 عروض ومنتجات جديدة</div><h1>أفضل المنتجات بأسعار مميزة</h1><p>توصيل لجميع ولايات الجزائر إلى المنزل أو المكتب — والدفع عند الاستلام.</p><a href="#products" class="main-btn">تسوق الآن</a></div></section>
-<section class="features"><div class="feature">🚚<b>توصيل لجميع الولايات</b><small>للمنزل أو المكتب</small></div><div class="feature">💵<b>الدفع عند الاستلام</b><small>ادفع عند وصول الطلب</small></div><div class="feature">📱<b>طلب سريع</b><small>اطلب مباشرة من الموقع</small></div><div class="feature">💬<b>خدمة العملاء</b><small>0540799984 — للاستفسار فقط</small></div></section>
-<main><div class="shop-layout"><aside class="category-sidebar"><h2>📂 أصناف المنتجات</h2><button class="all-categories" onclick="showAllProducts()">عرض جميع المنتجات</button><div id="cats" class="categories"></div></aside><section id="productsSection" class="products-area"><div class="section-head"><h2 id="productsHeading">جميع المنتجات</h2><input id="search" class="search" placeholder="🔎 ابحث عن منتج..." oninput="render()"></div><div id="grid" class="grid"></div></section></div></main>
-<footer><h3>متجري الإلكتروني</h3><p>الدفع عند الاستلام • التوصيل إلى جميع ولايات الجزائر</p><a class="wa" href="https://wa.me/213540799984" target="_blank" rel="noopener">💬 واتساب للاستفسار فقط: 0540799984</a></footer>
-<div id="cartModal" class="modal"><div class="panel"><button type="button" class="close" onclick="closeM()">×</button><h2>🛒 سلة المشتريات</h2><div id="items"></div><div class="total">المجموع: <b id="total">0 دج</b></div><form id="cartForm" onsubmit="order(event)"><input id="name" required placeholder="الاسم واللقب"><input id="phone" required type="tel" placeholder="رقم الهاتف"><select id="wilaya" required><option value="">اختر الولاية</option></select><input id="address" required placeholder="العنوان بالتفصيل"><select id="delivery" required><option value="">طريقة الاستلام</option><option>التوصيل إلى المنزل</option><option>التوصيل إلى المكتب</option></select><button type="submit" class="main-btn" style="width:100%">تأكيد الطلب — الدفع عند الاستلام</button></form></div></div>
-<div id="productDetailModal" class="modal"><div class="panel" style="max-width:760px"><button type="button" class="close" onclick="closeProduct()">×</button><div style="text-align:center"><img id="detailMainImage" src="" alt="" style="width:100%;max-height:55vh;object-fit:contain;border-radius:14px;margin-top:20px"><div id="detailThumbs" style="display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin:12px 0"></div></div><small id="detailCategory" style="color:#666"></small><h2 id="detailName" style="margin:8px 0"></h2><div id="detailPrice" class="price" style="font-size:1.25rem;margin:10px 0"></div><h3>وصف المنتج</h3><p id="detailDescription" style="white-space:pre-wrap;line-height:1.8"></p><button id="detailAddButton" type="button" class="add" style="width:100%">أضف إلى السلة</button></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="app.js"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>DZMARKAT | متجرك الإلكتروني</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="brand">DZMARKAT 🛍️<small>كل ما تحتاجه في مكان واحد</small></div>
+    <div class="actions"><button type="button" onclick="openCart()">🛒 السلة <b id="count">0</b></button></div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <div>🔥 عروض ومنتجات جديدة</div>
+      <h1>أفضل المنتجات بأسعار مميزة</h1>
+      <p>توصيل إلى المنزل أو المكتب في الولايات المتاحة — والدفع عند الاستلام.</p>
+      <a href="#productsSection" class="main-btn">تسوق الآن</a>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="feature">🚚<b>توصيل داخل الجزائر</b><small>للمنزل أو المكتب حسب الولاية</small></div>
+    <div class="feature">💵<b>الدفع عند الاستلام</b><small>ادفع عند وصول الطلب</small></div>
+    <div class="feature">📱<b>طلب سريع</b><small>اطلب مباشرة من الموقع</small></div>
+    <div class="feature">💬<b>خدمة العملاء</b><small>0540799984 — للاستفسار فقط</small></div>
+  </section>
+
+  <main>
+    <div class="shop-layout">
+      <aside class="category-sidebar">
+        <h2>📂 أصناف المنتجات</h2>
+        <button type="button" class="all-categories" onclick="showAllProducts()">عرض جميع المنتجات</button>
+        <div id="cats" class="categories"></div>
+      </aside>
+      <section id="productsSection" class="products-area">
+        <div class="section-head">
+          <h2 id="productsHeading">جميع المنتجات</h2>
+          <input id="search" class="search" placeholder="🔎 ابحث عن منتج..." oninput="render()" aria-label="البحث عن المنتجات">
+        </div>
+        <div id="grid" class="grid" aria-live="polite"></div>
+      </section>
+    </div>
+  </main>
+
+  <footer>
+    <h3>DZMARKAT</h3>
+    <p>الدفع عند الاستلام • التوصيل حسب الولاية وطريقة الاستلام</p>
+    <a class="wa" href="https://wa.me/213540799984" target="_blank" rel="noopener">💬 واتساب للاستفسار فقط: 0540799984</a>
+  </footer>
+
+  <div id="cartModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="cartTitle">
+    <div class="panel">
+      <button type="button" class="close" onclick="closeM()" aria-label="إغلاق">×</button>
+      <h2 id="cartTitle">🛒 سلة المشتريات</h2>
+      <div id="items"></div>
+      <div class="total">المجموع: <b id="total">0 دج</b></div>
+      <form id="cartForm" onsubmit="order(event)">
+        <input id="name" required maxlength="120" autocomplete="name" placeholder="الاسم واللقب">
+        <input id="phone" required type="tel" maxlength="30" autocomplete="tel" placeholder="رقم الهاتف">
+        <select id="wilaya" required autocomplete="address-level1"><option value="">اختر الولاية</option></select>
+        <input id="address" required maxlength="300" autocomplete="street-address" placeholder="العنوان بالتفصيل">
+        <select id="delivery" required>
+          <option value="">طريقة الاستلام</option>
+          <option value="التوصيل إلى المنزل">التوصيل إلى المنزل</option>
+          <option value="التوصيل إلى المكتب">التوصيل إلى المكتب</option>
+        </select>
+        <button type="submit" class="main-btn submit-order" style="width:100%">تأكيد الطلب — الدفع عند الاستلام</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="productDetailModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="detailName">
+    <div class="panel product-detail-panel">
+      <button type="button" class="close" onclick="closeProduct()" aria-label="إغلاق">×</button>
+      <div class="product-detail-images">
+        <img id="detailMainImage" src="" alt="" class="detail-main-image">
+        <div id="detailThumbs" class="detail-thumbs"></div>
+      </div>
+      <small id="detailCategory" class="detail-category"></small>
+      <h2 id="detailName" class="detail-name"></h2>
+      <div id="detailPrice" class="price detail-price"></div>
+      <h3>وصف المنتج</h3>
+      <p id="detailDescription" class="detail-description"></p>
+      <button id="detailAddButton" type="button" class="add detail-add">أضف إلى السلة</button>
+    </div>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

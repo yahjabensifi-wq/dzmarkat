@@ -1,5 +1,7 @@
 name = "dzmarkat"
 compatibility_date = "2026-10-09"
 
+[previews]
+
 [assets]
 directory = "."

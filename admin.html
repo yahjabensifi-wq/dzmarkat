@@ -1,7 +1,65 @@
-<!doctype html><html lang="ar" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>إدارة المتجر</title><link rel="stylesheet" href="style.css"></head><body>
-<header class="top"><div class="brand">لوحة إدارة المتجر ⚙️</div><div class="actions"><button onclick="location.href='index.html'">← المتجر</button><button onclick="logout()">خروج</button></div></header>
-<main><div id="loginBox" class="panel" style="max-width:480px;margin:45px auto"><h2>دخول الإدارة</h2><p class="note">أنشئ حسابًا في Supabase Auth ثم استخدم البريد وكلمة المرور هنا.</p><form onsubmit="login(event)"><input id="email" type="email" required placeholder="البريد الإلكتروني"><input id="password" type="password" required placeholder="كلمة المرور"><button class="main-btn" style="width:100%">دخول</button></form><p id="loginMsg"></p></div>
-<div id="dashboard" style="display:none"><div class="section-head"><h1>إدارة المتجر</h1><button class="main-btn" onclick="showAdd()">➕ إضافة منتج</button></div><div class="adminnav"><button class="main-btn" onclick="tab('productsTab')">المنتجات</button><button class="main-btn" onclick="tab('ordersTab')">الطلبات</button></div>
-<section id="productsTab"><div id="adminProducts" class="grid"></div></section><section id="ordersTab" style="display:none"><div id="orders"></div></section></div></main>
-<div id="productModal" class="modal"><div class="panel"><button class="close" onclick="closeP()">×</button><h2 id="formTitle">إضافة منتج</h2><form id="productForm" onsubmit="saveProduct(event)"><input id="pname" required placeholder="اسم المنتج"><input id="pprice" required type="number" min="0" placeholder="السعر بالدينار"><select id="pcat" required></select><textarea id="pdesc" placeholder="وصف المنتج"></textarea><label><b>صور المنتج</b></label><div id="imagePickers"></div><button type="button" class="main-btn" style="width:100%;margin:6px 0 10px" onclick="addImagePicker()">➕ إضافة صورة أخرى</button><small id="imageHint" style="display:block;color:#777;margin:4px 0 10px">يمكنك إضافة الصور واحدةً تلو الأخرى أو اختيار عدة صور إذا كان هاتفك يسمح بذلك.</small><div id="imagePreview" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px"></div><input id="oldimage" type="hidden"><button class="main-btn" style="width:100%">حفظ المنتج</button></form></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="admin.js"></script></body></html>
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>إدارة المتجر | DZMARKAT</title><link rel="stylesheet" href="style.css"></head>
+<body>
+<header class="top"><div class="brand">لوحة إدارة DZMARKAT ⚙️</div><div class="actions"><button type="button" onclick="location.href='index.html'">← المتجر</button><button type="button" onclick="logout()">خروج</button></div></header>
+<main>
+  <div id="loginBox" class="panel" style="max-width:480px;margin:45px auto">
+    <h2>دخول الإدارة</h2><p class="note">سجّل الدخول بحساب الإدارة المفعّل في Supabase.</p>
+    <form onsubmit="login(event)"><input id="email" type="email" required autocomplete="username" placeholder="البريد الإلكتروني"><input id="password" type="password" required autocomplete="current-password" placeholder="كلمة المرور"><button type="submit" class="main-btn" style="width:100%">دخول</button></form>
+    <p id="loginMsg" role="alert"></p>
+  </div>
+  <div id="dashboard" style="display:none">
+    <div class="section-head"><h1>إدارة المتجر</h1><button type="button" class="main-btn" onclick="showAdd()">➕ إضافة منتج</button></div>
+    <div class="adminnav"><button type="button" class="main-btn" onclick="tab('productsTab')">المنتجات</button><button type="button" class="main-btn" onclick="tab('ordersTab')">الطلبات</button></div>
+    <section id="productsTab"><div id="adminProducts" class="grid"></div></section>
+    <section id="ordersTab" style="display:none">
+      <div class="orders-summary" aria-label="ملخص الطلبيات">
+        <article class="orders-stat"><small>كل الطلبيات</small><strong id="statTotal">—</strong></article>
+        <article class="orders-stat"><small>طلبيات جديدة</small><strong id="statNew">—</strong></article>
+        <article class="orders-stat"><small>قيد الشحن</small><strong id="statShipping">—</strong></article>
+        <article class="orders-stat"><small>تم التسليم</small><strong id="statDelivered">—</strong></article>
+        <article class="orders-stat"><small>قيمة الطلبيات غير الملغاة</small><strong id="statValue">—</strong></article>
+      </div>
+      <div class="orders-toolbar">
+        <input id="orderSearch" type="search" placeholder="ابحث برقم الطلب أو اسم الزبون أو الهاتف أو الولاية..." oninput="filterOrders()" aria-label="البحث في الطلبيات">
+        <select id="orderStatusFilter" onchange="filterOrders()" aria-label="تصفية حسب الحالة">
+          <option value="">كل الحالات</option>
+          <option value="جديد">جديد</option>
+          <option value="تم التأكيد">تم التأكيد</option>
+          <option value="قيد الشحن">قيد الشحن</option>
+          <option value="تم التسليم">تم التسليم</option>
+          <option value="ملغى">ملغى</option>
+        </select>
+        <button type="button" class="main-btn" onclick="loadOrders()">↻ تحديث</button>
+      </div>
+      <p id="ordersMessage" class="note" role="status" style="display:none"></p>
+      <div class="orders-table-wrap">
+        <table class="orders-table">
+          <thead><tr><th>الطلب والتاريخ</th><th>الزبون</th><th>الهاتف</th><th>الولاية</th><th>طريقة التوصيل</th><th>الإجمالي</th><th>الحالة</th><th>التفاصيل</th></tr></thead>
+          <tbody id="ordersTableBody"><tr><td colspan="8">جارٍ تحميل الطلبيات...</td></tr></tbody>
+        </table>
+      </div>
+      <div id="ordersMobileList" class="orders-mobile-list" aria-label="قائمة الطلبيات"></div>
+      <p id="ordersCount" class="orders-count"></p>
+    </section>
+  </div>
+</main>
+<div id="productModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="formTitle">
+  <div class="panel"><button type="button" class="close" onclick="closeP()" aria-label="إغلاق">×</button><h2 id="formTitle">إضافة منتج</h2>
+    <form id="productForm" onsubmit="saveProduct(event)">
+      <input id="pname" required maxlength="180" placeholder="اسم المنتج">
+      <input id="pprice" required type="number" min="0" step="0.01" placeholder="السعر بالدينار">
+      <select id="pcat" required></select>
+      <textarea id="pdesc" maxlength="4000" placeholder="وصف المنتج"></textarea>
+      <label><b>صور المنتج</b></label><div id="imagePickers"></div>
+      <button type="button" class="main-btn" style="width:100%;margin:6px 0 10px" onclick="addImagePicker()">➕ إضافة حقل صور</button>
+      <small style="display:block;color:#777;margin:4px 0 10px">يمكنك اختيار عدة صور من الهاتف، وتظهر الصور المحفوظة قبل إضافة صور أخرى.</small>
+      <div id="imagePreview"></div><input id="oldimage" type="hidden">
+      <button type="submit" class="main-btn" style="width:100%">حفظ المنتج</button>
+    </form>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script src="config.js"></script><script src="admin.js"></script>
+</body>
+</html>
