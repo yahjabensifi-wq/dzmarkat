@@ -14,5 +14,19 @@ let row={name:pname.value,price:Number(pprice.value),category_id:Number(pcat.val
 if(uploaded.length){let base=(editing?.product_images||[]).length;let rows=uploaded.map((url,i)=>({product_id:productId,image_url:url,sort_order:base+i}));let ir=await db.from("product_images").insert(rows);if(ir.error)return alert("تم حفظ المنتج لكن تعذر حفظ الصور الإضافية.")}
 closeP();loadProducts()}
 async function del(id){if(!confirm("حذف المنتج؟"))return;await db.from("products").delete().eq("id",id);loadProducts()}
-async function loadOrders(){let {data}=await db.from("orders").select("*").order("created_at",{ascending:false});orders.innerHTML=(data||[]).map(o=>`<div class="order"><div class="row"><b>طلب #${o.id}</b><span>${new Date(o.created_at).toLocaleString("ar-DZ")}</span></div><p>👤 ${safe(o.customer_name)} — 📱 ${safe(o.phone)} — 📍 ${safe(o.wilaya)}</p><p>العنوان: ${safe(o.address)} | ${safe(o.delivery_method)} | ${Number(o.total).toLocaleString("ar-DZ")} دج</p><select class="status" onchange="status(${o.id},this.value)">${["جديد","تم التأكيد","قيد الشحن","تم التسليم","ملغى"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></div>`).join("")}
-async function status(id,v){await db.from("orders").update({status:v}).eq("id",id);loadOrders()}function tab(id){productsTab.style.display=id==="productsTab"?"block":"none";ordersTab.style.display=id==="ordersTab"?"block":"none"}async function logout(){await db.auth.signOut();location.reload()}function safe(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}init();
+async function loadOrders(){
+ const {data,error}=await db.from("orders").select("*").order("created_at",{ascending:false});
+ if(error){orders.innerHTML="<p>تعذر تحميل الطلبات. تحقق من صلاحيات قاعدة البيانات.</p>";return}
+ const list=data||[];
+ const details=await Promise.all(list.map(async o=>{
+   const res=await db.from("order_items").select("product_name,price,quantity").eq("order_id",o.id);
+   const itemsText=(res.data||[]).map(i=>`${safe(i.product_name||"منتج")} × ${Number(i.quantity||1)} — ${Number(i.price||0).toLocaleString("ar-DZ")} دج`).join("<br>");
+   return `<div class="order"><div class="row"><b>طلب #${o.id}</b><span>${new Date(o.created_at).toLocaleString("ar-DZ")}</span></div><p>👤 ${safe(o.customer_name)} — 📱 ${safe(o.phone)} — 📍 ${safe(o.wilaya)}</p><p>العنوان: ${safe(o.address)} | ${safe(o.delivery_method)}</p><p><b>المنتجات:</b><br>${itemsText||"لا توجد تفاصيل منتجات محفوظة"}</p><p><b>الإجمالي: ${Number(o.total).toLocaleString("ar-DZ")} دج</b> — الدفع عند الاستلام</p><select class="status" onchange="status(${o.id},this.value)">${["جديد","تم التأكيد","قيد الشحن","تم التسليم","ملغى"].map(s=>`<option ${o.status===s?"selected":""}>${s}</option>`).join("")}</select></div>`;
+ })).join("");
+ orders.innerHTML=details||"<p>لا توجد طلبات حتى الآن.</p>";
+}
+async function status(id,v){await db.from("orders").update({status:v}).eq("id",id);loadOrders()}
+function tab(id){productsTab.style.display=id==="productsTab"?"block":"none";ordersTab.style.display=id==="ordersTab"?"block":"none"}
+async function logout(){await db.auth.signOut();location.reload()}
+function safe(x){return String(x??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]))}
+init();
